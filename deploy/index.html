@@ -3,15 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>NN Assistant</title>
 </head>
 <body>
-    <script type="module">
-        import init, {add} from './script/assistant.js';
-
-        await init();
-
-        console.log(add(9 + 9));
-    </script>
+    <canvas id="render-target" width="500" height="500"></canvas>
+    <script type="module" src="script/index.js"></script>
 </body>
 </html>

@@ -3,5 +3,5 @@ build: ./src/lib.rs
 	cp ./pkg/*.js ./deploy/script
 	cp ./pkg/*.wasm ./deploy/script
 
-run: build
-	python -m http.server
+deploy:
+	python -m http.server -d deploy
