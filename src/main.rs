@@ -4,15 +4,13 @@ fn generate_model_weigth() -> f64 {
     return rand::thread_rng().gen_range(-1.0..=1.0);
 }
 
-fn model_cost(data: &[[f64; 2]; 4], model: &f64, bias: &f64) -> f64 {
+fn model_cost(data: &[[f64; 3]; 4], w1: &f64, w2: &f64) -> f64 {
     let mut result: f64 = 0.0;
-    let mut x: f64;
-    let mut y: f64;
-    let mut d: f64;
     for el in data {
-        x = el[0];
-        y = x * model + bias;
-        d = y - el[1];
+        let x1: &f64 = &el[0];
+        let x2: &f64 = &el[1];
+        let y: f64 = x1 * w1 + x2 * w2;
+        let d: f64 = y - el[2];
         result += d * d;
     }
     result /= data.len() as f64;
@@ -20,30 +18,28 @@ fn model_cost(data: &[[f64; 2]; 4], model: &f64, bias: &f64) -> f64 {
 }
 
 fn main() {
-    let data:[[f64; 2]; 4] = [
-        [1.0, 2.0],
-        [2.0, 4.0],
-        [3.0, 6.0],
-        [4.0, 8.0],
+    let eps:f64 = 1e-3;
+    let rate: f64 = 1e-2;
+    let data:[[f64; 3]; 4] = [
+        [0.0, 0.0, 0.0],
+        [0.0, 1.0, 1.0],
+        [1.0, 0.0, 1.0],
+        [1.0, 1.0, 1.0],
     ];
-    let mut weigth = generate_model_weigth() * 10.0;
-    let mut bias = generate_model_weigth() * 5.0;
-    let eps = 1e-3;
-    println!("W: {0}\nB: {1}", &weigth, &bias);
+    let mut w1: f64 = generate_model_weigth();
+    let mut w2: f64 = generate_model_weigth();
+    let mut cost: f64 = model_cost(&data, &w1, &w2);
     
-    while model_cost(&data, &weigth, &bias) > eps {
-        let cost = model_cost(&data, &weigth, &bias);
-        let dw = (model_cost(&data, &(weigth - &eps), &bias) - cost) / eps;
-        let db = (model_cost(&data, &weigth, &(bias  - &eps)) - cost) / eps;
-        weigth += dw * eps;
-        bias += db * eps;
-        println!("| C: {0}", model_cost(&data, &weigth, &bias));
+    while cost > 0.1 {
+        cost = model_cost(&data, &w1, &w2);
+        let dw1: f64 = (model_cost(&data, &(w1 + eps), &w2) - cost) / eps;
+        let dw2: f64 = (model_cost(&data, &w1, &(w2 + eps)) - cost) / eps;
+        w1 -= rate * dw1;
+        w2 -= rate * dw2;
+        println!("| W1: {0:.5}\tW2: {1:.5}\tC: {2:.5}", w1, w2, cost);
     }
-    
-    println!("W: {0}\nB: {1}", &weigth, &bias);
-    println!("\n+-- X --+- EXP -+- ACT -+");
+
     for el in data {
-        println!("| {0:.3} | {1:.3} | {2:.3} |", el[0], el[1], el[0] * &weigth);
+        println!("{0} {1} Ye:{2} Ya:{3:.0}", el[0], el[1], el[2], (el[0] * w1 + el[1] * w2));
     }
-    println!("+-------+-------+-------+");
 }
