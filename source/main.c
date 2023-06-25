@@ -19,12 +19,23 @@ float forward(nf_model m) {
     return m.l2_a.data[0];    
 }
 
-float cost(nf_model m, nf_matrix i, nf_matrix o) {
-    assert(i.rows == o.rows);
-    size_t n = i.rows;
-    for (size_t i = 0; i < n; i++) {
-        
+float cost(nf_model m, nf_matrix ti, nf_matrix to) {
+    assert(ti.rows == to.rows);
+    assert(to.cols == m.l2_a.cols);
+    size_t n = ti.rows;
+    float c = 0.0f;
+    for (size_t i = 0; i < n; ++i) {
+        nf_matrix x = nf_mat_row(ti, i);
+        nf_matrix y = nf_mat_row(to, i);
+        nf_mat_copy(m.l0_a, x);
+        forward(m);
+        size_t q = to.cols;
+        for (size_t j = 0; j < q; ++j) {
+            float d = NF_MAT_AT(m.l2_a, 0, j) - NF_MAT_AT(y, 0, j);
+            c += d * d;
+        }
     }
+    return c;
 }
 
 int main(void) {

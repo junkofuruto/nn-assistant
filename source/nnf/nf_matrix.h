@@ -9,7 +9,7 @@
 #include <time.h>
 #include <math.h>
 
-#define NF_MAT_AT(m, i, j) (m).data[(i) * (m).cols + (j)]
+#define NF_MAT_AT(m, row, col) (m).data[(row) * (m).cols + (col)]
 
 typedef struct {
     size_t cols;
@@ -18,6 +18,8 @@ typedef struct {
 } nf_matrix;
 
 nf_matrix nf_mat_alloc(size_t rows, size_t cols);
+nf_matrix nf_mat_row(nf_matrix m, size_t row);
+void nf_mat_copy(nf_matrix dest, nf_matrix src);
 void nf_mat_dot(nf_matrix dest, nf_matrix m1, nf_matrix m2);
 void nf_mat_rand(nf_matrix m, float min, float max);
 void nf_mat_fill(nf_matrix dest, float value);
@@ -38,6 +40,23 @@ void nf_init() {
         (unsigned long long)(tv.tv_sec) * 1000 +
         (unsigned long long)(tv.tv_usec) / 1000;
     srand((unsigned int)milliseconds_since_epoch);
+}
+nf_matrix nf_mat_row(nf_matrix m, size_t row) {
+    return (nf_matrix) {
+        .rows = 1,
+        .cols = m.cols,
+        .data = &NF_MAT_AT(m, row, 0),
+    };
+}
+void nf_mat_copy(nf_matrix dest, nf_matrix src) {
+    assert(dest.rows == src.rows);
+    assert(dest.cols == src.cols);
+
+    for (size_t i = 0; i < dest.rows; ++i) {
+        for (size_t j = 0; j < dest.cols; ++j) {
+            NF_MAT_AT(dest, i, j) = NF_MAT_AT(src, i, j);
+        }
+    }
 }
 nf_matrix nf_mat_alloc(size_t rows, size_t cols) {
     nf_matrix mat;
