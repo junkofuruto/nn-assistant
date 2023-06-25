@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include <math.h>
 
 #define NF_MAT_AT(m, i, j) (m).data[(i) * (m).cols + (j)]
 
@@ -22,6 +23,7 @@ void nf_mat_rand(nf_matrix m, float min, float max);
 void nf_mat_fill(nf_matrix dest, float value);
 void nf_mat_sum(nf_matrix dest, nf_matrix m);
 void nf_mat_print(nf_matrix m);
+void nf_mat_apply_sigmoid(nf_matrix m);
 float nf_rand_float();
 void nf_init();
 
@@ -48,6 +50,13 @@ void nf_mat_rand(nf_matrix m, float min, float max) {
     for (size_t i = 0; i < m.rows; ++i) {
         for (size_t j = 0; j < m.cols; ++j) {
             NF_MAT_AT(m, i, j) = nf_rand_float() * (max - min) + min;
+        }
+    }
+}
+void nf_mat_apply_sigmoid(nf_matrix m) {
+    for (size_t i = 0; i < m.rows; ++i) {
+        for (size_t j = 0; j < m.cols; ++j) {
+            NF_MAT_AT(m, i, j) = 1.0f / (1.0f + expf(-NF_MAT_AT(m, i, j)));
         }
     }
 }
