@@ -8,6 +8,18 @@ typedef struct {
     nf_matrix l2_w, l2_b, l2_a;
 } nf_model;
 
+nf_model nf_model_alloc(void) {
+    nf_model m;
+    m.l0_a = nf_mat_alloc(1, 2);
+    m.l1_w = nf_mat_alloc(2, 2);
+    m.l1_b = nf_mat_alloc(1, 2);
+    m.l1_a = nf_mat_alloc(1, 2);
+    m.l2_w = nf_mat_alloc(2, 1);
+    m.l2_b = nf_mat_alloc(1, 1);
+    m.l2_a = nf_mat_alloc(1, 1);
+    return m;
+}
+
 float forward(nf_model m) {
     nf_mat_dot(m.l1_a, m.l0_a, m.l1_w);
     nf_mat_sum(m.l1_a, m.l1_b);
@@ -45,7 +57,50 @@ float data[] = {
     1, 1, 0,
 };
 
+void finite_diff(nf_model m, nf_model g, float eps, nf_matrix ti, nf_matrix to) {
+    float saved;
+    float c = cost(m, ti, to);
 
+    for (size_t i; i < m.l1_w.rows; ++i) {
+        for (size_t j; j < m.l1_w.cols; ++j) {
+            saved = NF_MAT_AT(m.l1_w, i, j);
+            NF_MAT_AT(m.l1_w, i, j) += eps;
+            NF_MAT_AT(g.l1_w, i, j) = (cost(m, ti, to) - c) / eps;
+            NF_MAT_AT(m.l1_w, i, j) = saved;
+        }
+    }
+
+    for (size_t i; i < m.l1_b.rows; ++i) {
+        for (size_t j; j < m.l1_b.cols; ++j) {
+            saved = NF_MAT_AT(m.l1_b, i, j);
+            NF_MAT_AT(m.l1_b, i, j) += eps;
+            NF_MAT_AT(g.l1_b, i, j) = (cost(m, ti, to) - c) / eps;
+            NF_MAT_AT(m.l1_b, i, j) = saved;
+        }
+    }
+    
+    for (size_t i; i < m.l2_w.rows; ++i) {
+        for (size_t j; j < m.l2_w.cols; ++j) {
+            saved = NF_MAT_AT(m.l2_w, i, j);
+            NF_MAT_AT(m.l2_w, i, j) += eps;
+            NF_MAT_AT(g.l2_w, i, j) = (cost(m, ti, to) - c) / eps;
+            NF_MAT_AT(m.l2_w, i, j) = saved;
+        }
+    }
+
+    for (size_t i; i < m.l2_b.rows; ++i) {
+        for (size_t j; j < m.l2_b.cols; ++j) {
+            saved = NF_MAT_AT(m.l2_b, i, j);
+            NF_MAT_AT(m.l2_b, i, j) += eps;
+            NF_MAT_AT(g.l2_b, i, j) = (cost(m, ti, to) - c) / eps;
+            NF_MAT_AT(m.l2_b, i, j) = saved;
+        }
+    }
+}
+
+void learn(nf_model m, nf_model g) {
+    
+}
 
 int main(void) {
     nf_init();
@@ -66,20 +121,17 @@ int main(void) {
         .data = data + 2
     };
 
-    nf_model m;
-    m.l0_a = nf_mat_alloc(1, 2);
-    m.l1_w = nf_mat_alloc(2, 2);
-    m.l1_b = nf_mat_alloc(1, 2);
-    m.l1_a = nf_mat_alloc(1, 2);
-    m.l2_w = nf_mat_alloc(2, 1);
-    m.l2_b = nf_mat_alloc(1, 1);
-    m.l2_a = nf_mat_alloc(1, 1);
+    nf_model m = nf_model_alloc();
+    nf_model g = nf_model_alloc();
     nf_mat_rand(m.l1_w, -1.0f, 1.0f);
     nf_mat_rand(m.l1_b, -5.0f, 5.0f);
     nf_mat_rand(m.l2_w, -1.0f, 1.0f);
     nf_mat_rand(m.l2_b, -5.0f, 5.0f);
 
     printf("Cost: %f\n", cost(m, ti, to));
+    finite_diff(m, g, 1e-1f, ti, to);
+
+    return 0;
 
     for (size_t i = 0; i < 2; ++i) {
         for (size_t j = 0; j < 2; ++j) {
