@@ -35,28 +35,51 @@ float cost(nf_model m, nf_matrix ti, nf_matrix to) {
             c += d * d;
         }
     }
-    return c;
+    return c / n;
 }
+
+float data[] = {
+    0, 0, 0,
+    0, 1, 1,
+    1, 0, 1,
+    1, 1, 0,
+};
+
+
 
 int main(void) {
     nf_init();
 
+    size_t n = sizeof(data) / sizeof(data[0]) / 3;
+    size_t stride = 3;
+    nf_matrix ti = {
+        .rows = n,
+        .cols = 2,
+        .stride = stride,
+        .data = data
+    };
+    
+    nf_matrix to = {
+        .rows = n,
+        .cols = 1,
+        .stride = stride,
+        .data = data + 2
+    };
+
     nf_model m;
-
     m.l0_a = nf_mat_alloc(1, 2);
-
     m.l1_w = nf_mat_alloc(2, 2);
     m.l1_b = nf_mat_alloc(1, 2);
     m.l1_a = nf_mat_alloc(1, 2);
-
     m.l2_w = nf_mat_alloc(2, 1);
     m.l2_b = nf_mat_alloc(1, 1);
     m.l2_a = nf_mat_alloc(1, 1);
-
     nf_mat_rand(m.l1_w, -1.0f, 1.0f);
     nf_mat_rand(m.l1_b, -5.0f, 5.0f);
     nf_mat_rand(m.l2_w, -1.0f, 1.0f);
     nf_mat_rand(m.l2_b, -5.0f, 5.0f);
+
+    printf("Cost: %f\n", cost(m, ti, to));
 
     for (size_t i = 0; i < 2; ++i) {
         for (size_t j = 0; j < 2; ++j) {

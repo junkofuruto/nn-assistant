@@ -9,9 +9,10 @@
 #include <time.h>
 #include <math.h>
 
-#define NF_MAT_AT(m, row, col) (m).data[(row) * (m).cols + (col)]
+#define NF_MAT_AT(m, row, col) (m).data[(row) * (m).stride + (col)]
 
 typedef struct {
+    size_t stride;
     size_t cols;
     size_t rows;
     float *data;
@@ -19,6 +20,7 @@ typedef struct {
 
 nf_matrix nf_mat_alloc(size_t rows, size_t cols);
 nf_matrix nf_mat_row(nf_matrix m, size_t row);
+// nf_matrix nf_mat_sub(nf_matrix m, size_t );
 void nf_mat_copy(nf_matrix dest, nf_matrix src);
 void nf_mat_dot(nf_matrix dest, nf_matrix m1, nf_matrix m2);
 void nf_mat_rand(nf_matrix m, float min, float max);
@@ -45,6 +47,7 @@ nf_matrix nf_mat_row(nf_matrix m, size_t row) {
     return (nf_matrix) {
         .rows = 1,
         .cols = m.cols,
+        .stride = m.stride,
         .data = &NF_MAT_AT(m, row, 0),
     };
 }
@@ -62,6 +65,7 @@ nf_matrix nf_mat_alloc(size_t rows, size_t cols) {
     nf_matrix mat;
     mat.rows = rows;
     mat.cols = cols;
+    mat.stride = cols;
     mat.data = malloc(sizeof(*mat.data) * rows * cols);
     assert(mat.data != NULL);
     memset(mat.data, 0.0f, sizeof(float) * rows * cols);
