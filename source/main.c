@@ -1,6 +1,6 @@
 #define __NFRAMEWORK_IMPL__
 
-#include "framework/framework.h"
+#include "nnf/nf_matrix.h"
 
 int main(void) {
     nf_init();
