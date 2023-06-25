@@ -1,5 +1,5 @@
-#ifndef __NFRAMEWORK_H__
-#define __NFRAMEWORK_H__
+#ifndef __NFMATRIX_H__
+#define __NFMATRIX_H__
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -27,7 +27,7 @@ void nf_init();
 
 #endif
 
-#ifdef __NFRAMEWORK_IMPL__
+#ifdef __NFMATRIX_IMPL__
 
 void nf_init() {
     srand(time(0));
@@ -84,12 +84,14 @@ void nf_mat_sum(nf_matrix dest, nf_matrix m) {
     }
 }
 void nf_mat_print(nf_matrix m) {
+    printf("{\n");
     for (size_t i = 0; i < m.rows; ++i) {
         for (size_t j = 0; j < m.cols; ++j) {
-            printf("%9.6f  ", NF_MAT_AT(m, i, j));
+            printf("    %9.6f", NF_MAT_AT(m, i, j));
         }
         puts("");
     }
+    puts("}\n");
 }
 
 #endif

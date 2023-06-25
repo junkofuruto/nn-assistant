@@ -1,24 +1,26 @@
-#define __NFRAMEWORK_IMPL__
+#define __NFMATRIX_IMPL__
 
 #include "nnf/nf_matrix.h"
+
 
 int main(void) {
     nf_init();
 
-    nf_matrix mat1 = nf_mat_alloc(1, 2);
-    nf_mat_rand(mat1, -1.0f, 1.0f);
+    nf_matrix l1_w = nf_mat_alloc(2, 2);
+    nf_matrix l1_b = nf_mat_alloc(1, 2);
+    nf_matrix l2_w = nf_mat_alloc(2, 1);
+    nf_matrix l2_b = nf_mat_alloc(1, 1);
 
-    nf_matrix mat2 = nf_mat_alloc(2, 2);
-    nf_mat_rand(mat2, -1.0f, 1.0f);
+    nf_mat_rand(l1_w, -1.0f, 1.0f);
+    nf_mat_rand(l1_b, -5.0f, 5.0f);
+    nf_mat_rand(l2_w, -1.0f, 1.0f);
+    nf_mat_rand(l2_b, -5.0f, 5.0f);
 
-    nf_matrix mat_dest = nf_mat_alloc(1, 2);
+    nf_mat_print(l1_w);
+    nf_mat_print(l1_b);
+    nf_mat_print(l2_w);
+    nf_mat_print(l2_b);
 
-    nf_mat_dot(mat_dest, mat1, mat2);
-    nf_mat_print(mat1);
-    puts("*");
-    nf_mat_print(mat2);
-    puts("---------------------");
-    nf_mat_print(mat_dest);
 
 
     return 0;
