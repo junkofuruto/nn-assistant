@@ -1,2 +1,2 @@
-build/assistant.exe: source/main.c
-	gcc -Wall -Wextra -o build/assistant.exe source/main.c
+build/assistant.exe: source/main.c source/framework/framework.h
+	gcc -Wall -Wextra -lm -o build/assistant.exe source/main.c
