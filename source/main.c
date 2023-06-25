@@ -6,13 +6,9 @@ typedef struct {
     nf_matrix l0_a;
     nf_matrix l1_w, l1_b, l1_a;
     nf_matrix l2_w, l2_b, l2_a;
-} model;
+} nf_model;
 
-float forward(model m, float x1, float x2) {
-    nf_matrix x = nf_mat_alloc(1, 2);
-    NF_MAT_AT(x, 0, 0) = x1;
-    NF_MAT_AT(x, 0, 1) = x2;
-
+float forward(nf_model m) {
     nf_mat_dot(m.l1_a, m.l0_a, m.l1_w);
     nf_mat_sum(m.l1_a, m.l1_b);
     nf_mat_apply_sigmoid(m.l1_a);
@@ -23,10 +19,20 @@ float forward(model m, float x1, float x2) {
     return m.l2_a.data[0];    
 }
 
+float cost(nf_model m, nf_matrix i, nf_matrix o) {
+    assert(i.rows == o.rows);
+    size_t n = i.rows;
+    for (size_t i = 0; i < n; i++) {
+        
+    }
+}
+
 int main(void) {
     nf_init();
 
-    model m;
+    nf_model m;
+
+    m.l0_a = nf_mat_alloc(1, 2);
 
     m.l1_w = nf_mat_alloc(2, 2);
     m.l1_b = nf_mat_alloc(1, 2);
@@ -43,7 +49,9 @@ int main(void) {
 
     for (size_t i = 0; i < 2; ++i) {
         for (size_t j = 0; j < 2; ++j) {
-            printf("%zu ^ %zu = %f", i, j, forward(m, i, j));
+            NF_MAT_AT(m.l0_a, 0, 0) = i;
+            NF_MAT_AT(m.l0_a, 0, 1) = j;
+            printf("%zu ^ %zu = %f\n", i, j, forward(m));
         }
     }
     

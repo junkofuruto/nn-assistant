@@ -32,7 +32,12 @@ void nf_init();
 #ifdef __NFMATRIX_IMPL__
 
 void nf_init() {
-    srand(time(0));
+    struct timeval tv;
+    mingw_gettimeofday(&tv, NULL);
+    unsigned long long milliseconds_since_epoch =
+        (unsigned long long)(tv.tv_sec) * 1000 +
+        (unsigned long long)(tv.tv_usec) / 1000;
+    srand((unsigned int)milliseconds_since_epoch);
 }
 nf_matrix nf_mat_alloc(size_t rows, size_t cols) {
     nf_matrix mat;
